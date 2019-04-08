@@ -1,6 +1,6 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
-
+//test
 #include <QObject>
 #include <QHash>
 #include <QString>
