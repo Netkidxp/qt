@@ -15,21 +15,20 @@ class Dictionary : public QHash<QString,Dictionary>
 private:
     QString _data;
     uint _level;
-    const QString TAB = "\t";
-    const QString SPACE = " ";
-    const QString ENTER = "\r\n";
-    const QString LBRACE = "{";
-    const QString RBRACE = "}";
-    const QString END = ";";
-    const QString SEP = "\\";
+
+
     QString prefix;
 
+    static void clearAnno(QString &src);
+    static void clearRegexp(QString &src, const QString &exp);
+    static QStringList getRegexp(QString &src, const QString &exp);
 public:
+
+
     static Dictionary null;
     Dictionary();
-    Dictionary(const QString &data);
+    Dictionary(const QString &src);
     Dictionary(const Dictionary &dic);
-    Dictionary(const QStringList &code);
     QString str() const;
     QString name() const;
     uint level() const;

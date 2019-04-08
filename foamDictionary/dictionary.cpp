@@ -1,4 +1,6 @@
 #include "dictionary.h"
+#include <QRegExp>
+#include <symbol.h>
 
 uint Dictionary::level() const
 {
@@ -154,12 +156,22 @@ void Dictionary::setData(const QString &data)
     _data = data;
 }
 
+void Dictionary::clearAnno(QString &src)
+{
+
+}
+
+QStringList Dictionary::getRegexp(QString &src, const QString &exp)
+{
+
+}
+
 Dictionary::Dictionary():_data(""),_level(0),prefix("")
 {
 
 }
 
-Dictionary::Dictionary(const QString &data):_data(data),_level(0),prefix("")
+Dictionary::Dictionary(const QString &src):_data(""),_level(0),prefix("")
 {
 
 }
@@ -167,10 +179,6 @@ Dictionary::Dictionary(const QString &data):_data(data),_level(0),prefix("")
 Dictionary::Dictionary(const Dictionary &dic)
 {
     operator=(dic);
-}
-
-Dictionary::Dictionary(const QStringList &code)
-{
 }
 
 QString Dictionary::str() const
