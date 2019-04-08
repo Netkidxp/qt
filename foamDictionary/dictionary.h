@@ -15,19 +15,12 @@ class Dictionary : public QHash<QString,Dictionary>
 private:
     QString _data;
     uint _level;
-
-
     QString prefix;
 
-    static void clearAnno(QString &src);
-    static void clearRegexp(QString &src, const QString &exp);
-    static QStringList getRegexp(QString &src, const QString &exp);
 public:
-
-
-    static Dictionary null;
+    //static Dictionary null;
     Dictionary();
-    Dictionary(const QString &src);
+    Dictionary(const QString &data);
     Dictionary(const Dictionary &dic);
     QString str() const;
     QString name() const;
@@ -51,6 +44,6 @@ public:
     void write(QTextStream &os);
 
 };
-Dictionary Dictionary::null = Dictionary("null");
+static Dictionary null = Dictionary("null");
 
 #endif // DICTIONARY_H

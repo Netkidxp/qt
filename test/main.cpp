@@ -59,22 +59,17 @@ QString regexp_choose(const QString str, const QString reg)
 }
 void test_regexp()
 {
-    QFile f("F:\\blueCFD-Core-2017\\OpenFOAM-5.x\\tutorials_bak\\incompressible\\porousSimpleFoam\\angledDuctImplicit\\system\\fvSchemes");
+    QFile f("D:\\blueCFD\\OpenFOAM-5.x\\tutorials\\incompressible\\porousSimpleFoam\\angledDuctImplicit\\system\\fvSchemes");
     f.open(QFile::ReadOnly|QFile::Text);
     QString str(f.readAll());
-    FoamSrcUtil::clearAnno(str);
-    FoamSrcUtil::clearRedundantEnter(str);
     f.close();
-    QFile f1("f:\\text.txt");
-    f1.open(QFile::NewOnly|QFile::Text);
-    QTextStream ts(&f1);
-    ts << str;
-    f1.close();
+    Dictionary d = FoamSrcUtil::splitEntries(str);
+    std::cout << d << std::endl;
 }
 void test_regexp2()
 {
-    QString s("dff   ;");
-    QRegExp r = FoamSrcUtil::R_FOOT_ENT;
+    QString s("sdssssss  ss ss;");
+    QRegExp r = FoamSrcUtil::R_FOOT_ENTRY;
     int i = r.indexIn(s);
     std::cout << i << std::endl;
 }
@@ -82,6 +77,6 @@ void test_regexp2()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    test_regexp2();
+    test_regexp();
     return a.exec();
 }
