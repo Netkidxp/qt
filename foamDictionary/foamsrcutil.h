@@ -9,6 +9,7 @@
 class FoamSrcUtil
 {
 public:
+    /*
     static QRegExp R_MT_ANNO;//多行注释
     static QRegExp R_ST_ANNO;//单行注释
     static QRegExp R_ENTER;//换行
@@ -22,6 +23,7 @@ public:
     static QRegExp R_ENTRY_VALUE;//value key
     static QRegExp R_ENTRY_DICTIONARY;//dictionary key
     static QRegExp R_OUT_BRACE;
+    */
 
     static QString& clearAnno(QString &src);
     static QString& clearEnter(QString &src);
@@ -32,7 +34,22 @@ public:
     static int findFunctionValue(QString &src, int &len);
     static bool empty(const QString &src);
 };
-QRegExp FoamSrcUtil::R_MT_ANNO = QRegExp("/\\*(.|\\r?\\n)*\\*/");
+const static QRegExp R_MT_ANNO = QRegExp("/\\*(.|\\r?\\n)*\\*/");
+const static QRegExp R_ST_ANNO = QRegExp("//[^\\n]*\\r?\\n");
+const static QRegExp R_ENTER = QRegExp("\\r?\\n");
+const static QRegExp R_TWOMORE_ENTER = QRegExp("(\\r?\\n){2,}");
+const static QRegExp R_MUTI_SPACE = QRegExp("\\s{2,}");
+const static QRegExp R_FIRSTLINE_ENTER = QRegExp("^\\r?\\n");
+const static QRegExp R_LASTLINE_ENTER = QRegExp("\\r?\\n$");
+const static QRegExp R_OUT_BRACE = QRegExp("(?<=\\{).*(?=\\})");
+const static QRegExp R_FOOT_ENTRY = QRegExp("[^\\{\\}\\s]+\\s+[^\\{\\}\\s]+(\\s+[^\\{\\}\\s])?;$");
+const static QRegExp R_SUB_DICTIONARY = QRegExp("\\s*[\\w\"\\(\\)\\.\\[\\]\\$\\|]+\\s+\\{+");
+const static QRegExp R_ENTRY_NAME = QRegExp("\\s?([^\\s\\{\\}]+)\\s");
+const static QRegExp R_ENTRY_VALUE = QRegExp("^\\s[^\\{\\}\\s]+[^;]*;");
+const static QRegExp R_ENTRY_DICTIONARY = QRegExp("(?<=\\{).*(?=\\})");
+
+//QRegExp FoamSrcUtil::R_MT_ANNO = QRegExp("/\\*(.|\\r?\\n)*\\*/");
+/*
 QRegExp FoamSrcUtil::R_ST_ANNO = QRegExp("//[^\\n]*\\r?\\n");
 QRegExp FoamSrcUtil::R_ENTER = QRegExp("\\r?\\n");
 QRegExp FoamSrcUtil::R_TWOMORE_ENTER = QRegExp("(\\r?\\n){2,}");
@@ -45,6 +62,8 @@ QRegExp FoamSrcUtil::R_SUB_DICTIONARY = QRegExp("\\s*[\\w\"\\(\\)\\.\\[\\]\\$\\|
 QRegExp FoamSrcUtil::R_ENTRY_NAME = QRegExp("\\s?([^\\s\\{\\}]+)\\s");
 QRegExp FoamSrcUtil::R_ENTRY_VALUE = QRegExp("^\\s[^\\{\\}\\s]+[^;]*;");//^\s[^\{\}\s;]+[^;]*;
 QRegExp FoamSrcUtil::R_ENTRY_DICTIONARY = QRegExp("(?<=\\{).*(?=\\})");
+*/
+
 
 
 #endif // FOAMSRCUTIL_H

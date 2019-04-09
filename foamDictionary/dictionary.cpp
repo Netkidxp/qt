@@ -219,4 +219,3 @@ QTextStream &operator<<(QTextStream &os, Dictionary &dic)
     return os;
 }
 
-//Dictionary Dictionary::null = Dictionary("null");

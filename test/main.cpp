@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
+#include "foamfile.h"
 void test_foamlib()
 {
     Dictionary d;
@@ -69,14 +70,22 @@ void test_regexp()
 void test_regexp2()
 {
     QString s("sdssssss  ss ss;");
-    QRegExp r = FoamSrcUtil::R_FOOT_ENTRY;
+    QRegExp r = R_FOOT_ENTRY;
     int i = r.indexIn(s);
     std::cout << i << std::endl;
 }
-
+void test_foamfile()
+{
+    FoamFile f("F:\\blueCFD-Core-2017\\OpenFOAM-5.x\\tutorials_bak\\incompressible\\pimpleDyMFoam\\wingMotion\\wingMotion2D_simpleFoam\\0.orig\\p");
+    if(f!=null)
+    {
+        bool res = f.write("f:\\foamfile1.txt");
+        qDebug() << res ;
+    }
+}
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    test_regexp();
+    test_foamfile();
     return a.exec();
 }

@@ -2,18 +2,18 @@
 
 QString& FoamSrcUtil::clearAnno(QString &src)
 {
-    src.remove(FoamSrcUtil::R_ST_ANNO);
-    src.remove(FoamSrcUtil::R_MT_ANNO);
+    src.remove(R_ST_ANNO);
+    src.remove(R_MT_ANNO);
     return src;
 }
 
 QString &FoamSrcUtil::clearEnter(QString &src)
 {
-    src.replace(FoamSrcUtil::R_TWOMORE_ENTER,"\n");
-    src.remove(FoamSrcUtil::R_FIRSTLINE_ENTER);
-    src.remove(FoamSrcUtil::R_LASTLINE_ENTER);
-    src.replace(FoamSrcUtil::R_ENTER,SPACE);
-    src.replace(FoamSrcUtil::R_MUTI_SPACE,SPACE);
+    src.replace(R_TWOMORE_ENTER,"\n");
+    src.remove(R_FIRSTLINE_ENTER);
+    src.remove(R_LASTLINE_ENTER);
+    src.replace(R_ENTER,SPACE);
+    src.replace(R_MUTI_SPACE,SPACE);
 
     return src;
 }
@@ -24,9 +24,7 @@ Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
     QString s(src);
     clearAnno(s);
     clearEnter(s);
-    QRegExp r_name(FoamSrcUtil::R_ENTRY_NAME);
-    QRegExp r_value(FoamSrcUtil::R_ENTRY_VALUE);
-    QRegExp r_dictionary(FoamSrcUtil::R_ENTRY_DICTIONARY);
+    QRegExp r_name(R_ENTRY_NAME);
     while(!empty(s))
     {
         int pos = r_name.indexIn(s);
