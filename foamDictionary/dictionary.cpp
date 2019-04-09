@@ -153,16 +153,14 @@ bool Dictionary::foot() const
 
 Dictionary &Dictionary::item(const QString &name)
 {
-    Dictionary &dic = null;
     for(Dictionary::Iterator it = begin();it!=end();it++)
     {
         if(it->first == name)
         {
-            dic = it->second;
-            break;
+            return it->second;
         }
     }
-    return dic;
+    return null;
 }
 
 int Dictionary::indexOf(const QString &name)
