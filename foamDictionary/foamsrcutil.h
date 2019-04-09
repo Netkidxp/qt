@@ -5,6 +5,7 @@
 #include "symbol.h"
 #include <QPair>
 #include <dictionary.h>
+#include <monitor.h>
 class FoamSrcUtil
 {
 public:
@@ -24,9 +25,12 @@ public:
 
     static QString& clearAnno(QString &src);
     static QString& clearEnter(QString &src);
-    static Dictionary splitEntries(const QString &src);
+    static Dictionary decode(const QString &src, Monitor *monitor = nullptr);
     static QString& clearOutBrace(QString &src);
-    static int findSubDictionary(QString &src, int start, int &len);
+    static int findSubDictionary(QString &src, int &len);
+    static int findValue(QString &src, int &len);
+    static int findFunctionValue(QString &src, int &len);
+    static bool empty(const QString &src);
 };
 QRegExp FoamSrcUtil::R_MT_ANNO = QRegExp("/\\*(.|\\r?\\n)*\\*/");
 QRegExp FoamSrcUtil::R_ST_ANNO = QRegExp("//[^\\n]*\\r?\\n");
@@ -38,7 +42,7 @@ QRegExp FoamSrcUtil::R_LASTLINE_ENTER = QRegExp("\\r?\\n$");
 QRegExp FoamSrcUtil::R_OUT_BRACE = QRegExp("(?<=\\{).*(?=\\})");
 QRegExp FoamSrcUtil::R_FOOT_ENTRY = QRegExp("[^\\{\\}\\s]+\\s+[^\\{\\}\\s]+(\\s+[^\\{\\}\\s])?;$");
 QRegExp FoamSrcUtil::R_SUB_DICTIONARY = QRegExp("\\s*[\\w\"\\(\\)\\.\\[\\]\\$\\|]+\\s+\\{+");
-QRegExp FoamSrcUtil::R_ENTRY_NAME = QRegExp("\\b[^\\s\\{\\}]+\\b");
+QRegExp FoamSrcUtil::R_ENTRY_NAME = QRegExp("\\s?([^\\s\\{\\}]+)\\s");
 QRegExp FoamSrcUtil::R_ENTRY_VALUE = QRegExp("^\\s[^\\{\\}\\s]+[^;]*;");//^\s[^\{\}\s;]+[^;]*;
 QRegExp FoamSrcUtil::R_ENTRY_DICTIONARY = QRegExp("(?<=\\{).*(?=\\})");
 

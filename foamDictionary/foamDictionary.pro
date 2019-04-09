@@ -24,13 +24,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     dictionary.cpp \
-    foamsrcutil.cpp
+    foamsrcutil.cpp \
+    monitor.cpp
 
 
 HEADERS += \
     dictionary.h \
     foamsrcutil.h \
-    symbol.h
+    symbol.h \
+    monitor.h
 
 
 unix {

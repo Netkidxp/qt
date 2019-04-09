@@ -59,11 +59,11 @@ QString regexp_choose(const QString str, const QString reg)
 }
 void test_regexp()
 {
-    QFile f("D:\\blueCFD\\OpenFOAM-5.x\\tutorials\\incompressible\\porousSimpleFoam\\angledDuctImplicit\\system\\fvSchemes");
+    QFile f("F:\\blueCFD-Core-2017\\OpenFOAM-5.x\\tutorials_bak\\incompressible\\pimpleDyMFoam\\wingMotion\\wingMotion2D_simpleFoam\\0.orig\\p");
     f.open(QFile::ReadOnly|QFile::Text);
     QString str(f.readAll());
     f.close();
-    Dictionary d = FoamSrcUtil::splitEntries(str);
+    Dictionary d = FoamSrcUtil::decode(str);
     std::cout << d << std::endl;
 }
 void test_regexp2()

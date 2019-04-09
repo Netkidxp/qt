@@ -12,6 +12,7 @@ const QString SEP = "\\";
 const QString LANNO = "/*";
 const QString RANNO = "*/";
 const QString ANNO = "//";
-
+const QString SHARP = "#";
+const QString QUOTE = "\"";
 
 #endif // SYMBOL_H

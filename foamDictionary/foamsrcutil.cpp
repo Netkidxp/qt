@@ -12,13 +12,13 @@ QString &FoamSrcUtil::clearEnter(QString &src)
     src.replace(FoamSrcUtil::R_TWOMORE_ENTER,"\n");
     src.remove(FoamSrcUtil::R_FIRSTLINE_ENTER);
     src.remove(FoamSrcUtil::R_LASTLINE_ENTER);
-    src.replace(FoamSrcUtil::R_ENTER," ");
-    src.replace(FoamSrcUtil::R_MUTI_SPACE," ");
+    src.replace(FoamSrcUtil::R_ENTER,SPACE);
+    src.replace(FoamSrcUtil::R_MUTI_SPACE,SPACE);
 
     return src;
 }
 
-Dictionary FoamSrcUtil::splitEntries(const QString &src)
+Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
 {
     Dictionary dic;
     QString s(src);
@@ -27,37 +27,94 @@ Dictionary FoamSrcUtil::splitEntries(const QString &src)
     QRegExp r_name(FoamSrcUtil::R_ENTRY_NAME);
     QRegExp r_value(FoamSrcUtil::R_ENTRY_VALUE);
     QRegExp r_dictionary(FoamSrcUtil::R_ENTRY_DICTIONARY);
-    int pos = 0;
-    while(s!=" ")
+    while(!empty(s))
     {
-        pos = r_name.indexIn(s,pos);
+        int pos = r_name.indexIn(s);
         if(pos == -1)
         {
+            if(monitor)
+            {
+                QString err = QString("FoamSrcUtil::decode:\n{type:\t%1\nsrc:\t%2\n}")
+                        .arg("decode entry name")
+                        .arg(s);
+                monitor->error(err);
+            }
+            dic = null;
             break;
         }
         else
         {
-            QString name = r_name.capturedTexts()[0];
-            pos +=r_name.matchedLength();
-            int vpos = r_value.indexIn(s,pos);
-            if(vpos == -1)//非value格式，要么非法要么就是子字典
+            int len = 0;
+            QString name = r_name.capturedTexts()[1];
+            s = s.right(s.length()-pos-r_name.matchedLength());
+            if(name.startsWith(SHARP))
             {
-                int len = 0;
-                vpos = findSubDictionary(s,pos,len);
-                if(vpos == -1)
+                pos = findFunctionValue(s, len);
+                if(pos == -1)
+                {
+                    if(monitor)
+                    {
+                        QString err = QString("FoamSrcUtil::decode:\n{type:\t%1\nentry:\t%2\nsrc:\t%3\n}")
+                                .arg("decode function value")
+                                .arg(name)
+                                .arg(s);
+                        monitor->error(err);
+                    }
+                    dic =  null;
                     break;
+                }
                 else
                 {
-                    pos = vpos + len;
-                    QString subdic = s.mid(vpos+1,len-2);
-                    dic.setChild(name,splitEntries(subdic));
+                    QString value = s.mid(pos,len);
+                    value.remove(END);
+                    dic.setChild(name,value);
+                    s = s.right(s.length() - pos - len);
                 }
             }
-            else //value格式
+            else
             {
-                pos +=r_value.matchedLength();
-                QString value = r_value.capturedTexts()[0];
-                dic.setChild(name,value);
+                pos = findValue(s, len);
+                if(pos == -1)//非value格式，要么非法要么就是子字典
+                {
+                    pos = findSubDictionary(s,len);
+                    if(pos == -1)
+                    {
+                        if(monitor)
+                        {
+                            QString err = QString("FoamSrcUtil::decode:\n{type:\t%1\nentry:\t%2\nsrc:\t%3\n}")
+                                    .arg("decode entry value")
+                                    .arg(name)
+                                    .arg(s);
+                            monitor->error(err);
+                        }
+                        dic = null;
+                        break;
+                    }
+                    else
+                    {
+
+                        QString subdicstr = s.mid(pos+1,len-2);
+                        Dictionary subdic = decode(subdicstr, monitor);
+                        if(subdic == null)
+                        {
+                            dic = null;
+                            break;
+                        }
+                        else
+                        {
+                            dic.setChild(name,subdic);
+                            s = s.right(s.length() - pos - len - 1);
+                        }
+
+                    }
+                }
+                else //value格式
+                {
+                    QString value = s.mid(pos,len);
+                    value.remove(END);
+                    dic.setChild(name,value);
+                    s = s.right(s.length() - pos - len);
+                }
             }
         }
     }
@@ -71,12 +128,12 @@ QString &FoamSrcUtil::clearOutBrace(QString &src)
     return src;
 }
 
-int FoamSrcUtil::findSubDictionary(QString &src, int start, int &len)
+int FoamSrcUtil::findSubDictionary(QString &src, int &len)
 {
     int l = -1;
     int r = -1;
     int level = 0;
-    for(int i=start;i<src.length();i++)
+    for(int i=0;i<src.length();i++)
     {
         if(src[i] == LBRACE)
         {
@@ -101,6 +158,77 @@ int FoamSrcUtil::findSubDictionary(QString &src, int start, int &len)
     else
     {
         return -1;
+    }
+}
+
+int FoamSrcUtil::findValue(QString &src, int &len)
+{
+    int l = -1;
+    int r = -1;
+    for(int i=0;i<src.length();i++)
+    {
+        if(src[i] == LBRACE || src[i] == RBRACE)
+            return -1;
+        else if(src[i] == END)
+        {
+            r = i;
+            break;
+        }
+        else if(src[i] == SPACE)
+        {
+            continue;
+        }
+        else
+        {
+            if(l == -1)
+                l = i;
+        }
+    }
+    len = r - l + 1;
+    if(len >= 1)
+        return l;
+    else
+    {
+        return -1;
+    }
+}
+
+int FoamSrcUtil::findFunctionValue(QString &src, int &len)
+{
+    int l = -1;
+    int r = -1;
+    for(int i=0;i<src.length();i++)
+    {
+        if(src[i] == QUOTE)
+        {
+            if(l == -1)
+            {
+                l = i;
+            }
+            else
+            {
+                r = i;
+                break;
+            }
+        }
+    }
+    len = r - l + 1;
+    if(len >= 2)
+        return l;
+    else
+    {
+        return -1;
+    }
+}
+
+bool FoamSrcUtil::empty(const QString &src)
+{
+    if(src.length() ==0)
+        return true;
+    else
+    {
+        QRegExp r("^[\\s]*$");
+        return r.indexIn(src) != -1;
     }
 }
 

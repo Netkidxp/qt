@@ -161,6 +161,11 @@ Dictionary::Dictionary():_data(""),_level(0),prefix("")
 
 }
 
+Dictionary::~Dictionary()
+{
+
+}
+
 Dictionary::Dictionary(const QString &data):_data(data),_level(0),prefix("")
 {
 

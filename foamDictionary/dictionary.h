@@ -20,6 +20,7 @@ private:
 public:
     //static Dictionary null;
     Dictionary();
+    virtual ~Dictionary();
     Dictionary(const QString &data);
     Dictionary(const Dictionary &dic);
     QString str() const;
@@ -41,7 +42,7 @@ public:
     void setData(const QString &data);
     bool root() const;
     bool foot() const;
-    void write(QTextStream &os);
+    virtual void write(QTextStream &os);
 
 };
 static Dictionary null = Dictionary("null");
