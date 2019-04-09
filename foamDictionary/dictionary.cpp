@@ -11,9 +11,17 @@ Dictionary &Dictionary::setChild(const QString &name, const Dictionary &child)
 {
     Dictionary newDic = child;
     newDic.setLevel(_level + 1);
-    insert(name,newDic);
+    int i = indexOf(name);
+    if(i==-1)
+    {
+        append(QPair<QString,Dictionary>(name,newDic));
+    }
+    else
+    {
+        replace(i,QPair<QString,Dictionary>(name,newDic));
+    }
     _data = "";
-    return operator[](name);
+    return item(name);
 }
 
 Dictionary& Dictionary::setChild(const QString &name, const QString &data)
@@ -21,21 +29,21 @@ Dictionary& Dictionary::setChild(const QString &name, const QString &data)
     Dictionary dic = data;
     setChild(name, dic);
     _data = "";
-    return operator[](name);
+    return item(name);
 }
 
 Dictionary &Dictionary::setChild(const QPair<QString, Dictionary> &child)
 {
     setChild(child.first,child.second);
     _data = "";
-    return operator[](child.first);
+    return item(child.first);
 }
 
 Dictionary& Dictionary::setChild(const QPair<QString, QString> &child)
 {
     setChild(child.first,child.second);
     _data = "";
-    return operator[](child.first);
+    return item(child.first);
 }
 
 Dictionary &Dictionary::addChild(const QString &name)
@@ -51,7 +59,7 @@ Dictionary &Dictionary::operator=(const Dictionary &dic)
     clear();
     for(Dictionary::const_iterator it=dic.constBegin();it!=dic.constEnd();it++)
     {
-        insert(it.key(),it.value());
+        append(*it);
     }
     this->setLevel(dic.level());
     this->setData(dic.data());
@@ -83,7 +91,7 @@ bool Dictionary::equals(const Dictionary &dic)
         return true;
     if(_data != dic.data())
         return false;
-    bool res = static_cast<QHash<QString,Dictionary>>(dic).operator==(*this);
+    bool res = static_cast<QList<QPair<QString,Dictionary>>>(dic).operator==(*this);
     return res;
 }
 
@@ -93,7 +101,7 @@ Dictionary &Dictionary::lookup(const QString &url)
     if(fir == -1)
     {
         if(contains(url))
-            return operator[](url);
+            return item(url);
         else
         {
             return null;
@@ -106,7 +114,7 @@ Dictionary &Dictionary::lookup(const QString &url)
         if(contains(name1))
         {
 
-            return operator[](name1).lookup(name2);
+            return item(name1).item(name2);
         }
         else
         {
@@ -121,12 +129,10 @@ void Dictionary::setLevel(uint level)
     prefix = "";
     for(uint i=0;i<level;i++)
         prefix += TAB;
-    for(Dictionary::const_iterator it=constBegin();it!=constEnd();it++)
+    for(Dictionary::Iterator it=begin();it!=end();it++)
     {
-        QString key = it.key();
-        Dictionary dic = it.value();
+        Dictionary &dic = it->second;
         dic.setLevel(_level +1);
-        insert(key,dic);
     }
 }
 
@@ -143,6 +149,55 @@ bool Dictionary::root() const
 bool Dictionary::foot() const
 {
     return _data != "";
+}
+
+Dictionary &Dictionary::item(const QString &name)
+{
+    Dictionary &dic = null;
+    for(Dictionary::Iterator it = begin();it!=end();it++)
+    {
+        if(it->first == name)
+        {
+            dic = it->second;
+            break;
+        }
+    }
+    return dic;
+}
+
+int Dictionary::indexOf(const QString &name)
+{
+    int res = -1;
+    for(Dictionary::const_iterator it = constBegin();it!=constEnd();it++)
+    {
+        QPair<QString,Dictionary> item = *it;
+        if(it->first == name)
+        {
+            res = QList<QPair<QString,Dictionary>>::indexOf(item);
+            break;
+        }
+    }
+    return res;
+}
+
+bool Dictionary::contains(const QString &name)
+{
+    return indexOf(name) != -1;
+}
+
+Dictionary &Dictionary::operator[](const QString &name)
+{
+    return item(name);
+}
+
+void Dictionary::remove(const QString name)
+{
+    int i = indexOf(name);
+    if(i==-1)
+        return;
+    else {
+        removeAt(i);
+    }
 }
 
 void Dictionary::write(QTextStream &os)
@@ -187,8 +242,8 @@ QString Dictionary::str() const
         {
             for(Dictionary::const_iterator it=constBegin();it!=constEnd();it++)
             {
-                QString key = it.key();
-                const Dictionary dic = it.value();
+                QString key = it->first;
+                const Dictionary dic = it->second;
                 s += prefix + TAB + key + dic.str();
             }
         }
@@ -197,8 +252,8 @@ QString Dictionary::str() const
             s = ENTER + prefix + LBRACE + ENTER;
             for(Dictionary::const_iterator it=constBegin();it!=constEnd();it++)
             {
-                QString key = it.key();
-                const Dictionary dic = it.value();
+                QString key = it->first;
+                const Dictionary dic = it->second;
                 s += prefix + TAB + key + dic.str();
             }
             s +=prefix + RBRACE + ENTER;

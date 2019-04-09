@@ -6,17 +6,17 @@
 #include <QString>
 #include <QTextStream>
 #include <QPair>
+#include <QList>
 
 class Dictionary;
 std::ostream& operator<<(std::ostream &os,const Dictionary &dic);
 QTextStream& operator<<(QTextStream &os,Dictionary &dic);
-class Dictionary : public QHash<QString,Dictionary>
+class Dictionary : public QList<QPair<QString,Dictionary>>
 {
 private:
     QString _data;
     uint _level;
     QString prefix;
-
 public:
     //static Dictionary null;
     Dictionary();
@@ -42,6 +42,11 @@ public:
     void setData(const QString &data);
     bool root() const;
     bool foot() const;
+    Dictionary &item(const QString &name);
+    int indexOf(const QString &name);
+    bool contains(const QString &name);
+    Dictionary& operator[](const QString &name);
+    void remove(const QString name);
     virtual void write(QTextStream &os);
 
 };

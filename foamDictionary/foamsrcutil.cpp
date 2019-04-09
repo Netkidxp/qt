@@ -25,6 +25,10 @@ Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
     clearAnno(s);
     clearEnter(s);
     QRegExp r_name(R_ENTRY_NAME);
+    if(monitor)
+    {
+        monitor->progress(0.0);
+    }
     while(!empty(s))
     {
         int pos = r_name.indexIn(s);
@@ -92,9 +96,17 @@ Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
                     {
 
                         QString subdicstr = s.mid(pos+1,len-2);
-                        Dictionary subdic = decode(subdicstr, monitor);
+                        Dictionary subdic = decode(subdicstr);
                         if(subdic == null)
                         {
+                            if(monitor)
+                            {
+                                QString err = QString("FoamSrcUtil::decode:\n{type:\t%1\nentry:\t%2\nsrc:\t%3\n}")
+                                        .arg("decode sub dictionary")
+                                        .arg(name)
+                                        .arg(subdicstr);
+                                monitor->error(err);
+                            }
                             dic = null;
                             break;
                         }
@@ -102,6 +114,10 @@ Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
                         {
                             dic.setChild(name,subdic);
                             s = s.right(s.length() - pos - len - 1);
+                            if(monitor)
+                            {
+                                monitor->progress(s.length()/src.length());
+                            }
                         }
 
                     }
@@ -112,9 +128,17 @@ Dictionary FoamSrcUtil::decode(const QString &src, Monitor *monitor)
                     value.remove(END);
                     dic.setChild(name,value);
                     s = s.right(s.length() - pos - len);
+                    if(monitor)
+                    {
+                        monitor->progress(s.length()/src.length());
+                    }
                 }
             }
         }
+    }
+    if(monitor)
+    {
+        monitor->progress(1.0);
     }
     return dic;
 }

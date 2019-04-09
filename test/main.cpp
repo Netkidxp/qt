@@ -86,6 +86,6 @@ void test_foamfile()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    test_foamfile();
+    test_foamlib();
     return a.exec();
 }
